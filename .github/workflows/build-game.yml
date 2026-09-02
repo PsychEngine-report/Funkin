@@ -183,3 +183,90 @@ jobs:
           path: export/release/windows/bin
           if-no-files-found: error
           compression-level: 6
+  ios:
+    name: iOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - name: Configure iOS
+        shell: bash
+        run: |
+          echo "CXXFLAGS=-std=c++20" >> "$GITHUB_ENV"
+
+      - name: Install Linux dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libdbus-1-dev \
+            libasound2-dev \
+            libudev-dev \
+            libpipewire-0.3-dev \
+            libpulse-dev \
+            libxkbcommon-dev \
+            libwayland-dev \
+            libwayland-bin \
+            wayland-protocols \
+            libx11-dev \
+            libxext-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libxss-dev \
+            libgl1-mesa-dev \
+            libglu1-mesa-dev \
+            pkg-config
+
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.7
+
+      - name: Install HMM
+        shell: bash
+        run: |
+          haxelib install hmm --quiet
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          rm -rf .haxelib
+          haxelib run hmm install
+
+      - name: Build hxcpp
+        shell: bash
+        run: |
+          HXCPP_PATH=$(haxelib libpath hxcpp | tr -d '\n')
+          cd "$HXCPP_PATH/tools/hxcpp"
+          haxe compile.hxml
+
+      - name: Rebuild Lime
+        shell: bash
+        run: |
+          haxelib run lime rebuild cpp
+
+      - name: Rebuild Lime iOS
+        shell: bash
+        run: |
+          haxelib run lime ios android
+
+      - name: Build iOS
+        shell: bash
+        run: |
+          haxelib run lime build ios -release -DGITHUB_BUILD
+
+      - name: Upload Android
+        uses: actions/upload-artifact@v4
+        with:
+          name: Funkin-android
+          path: export/release/ios/**/*.ipa
+          if-no-files-found: error
+          compression-level: 0
+    
