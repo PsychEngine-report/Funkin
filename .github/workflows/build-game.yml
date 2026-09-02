@@ -19,7 +19,7 @@ on:
 jobs:
 
   gather-changes:
-    runs-on: build-set
+    runs-on: ubuntu-latest
     outputs:
       trigger-build: ${{ steps.should-trigger.outputs.result }}
     steps:
@@ -53,7 +53,7 @@ jobs:
               || manual
 
   gather-tags:
-    runs-on: build-set
+    runs-on: ubuntu-latest
     outputs:
       primary: ${{ steps.build-tags.outputs.primary }}
       list: ${{ steps.build-tags.outputs.list }}
@@ -148,7 +148,7 @@ jobs:
         uses: actions/create-github-app-token@v3
         id: app_token
         with:
-          app-id: ${{ vars.APP_ID }}
+          app-id: client-id
           private-key: ${{ secrets.APP_PEM }}
           owner: ${{ github.repository_owner }}
       - name: Checkout repo
@@ -225,7 +225,7 @@ jobs:
         uses: actions/create-github-app-token@v3
         id: app_token
         with:
-          app-id: ${{ vars.APP_ID }}
+          app-id: client-id
           private-key: ${{ secrets.APP_PEM }}
           owner: ${{ github.repository_owner }}
       - name: Checkout repo
