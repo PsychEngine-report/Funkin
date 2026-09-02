@@ -146,7 +146,7 @@ jobs:
           git config --global --replace-all safe.directory $GITHUB_WORKSPACE
       - name: Get checkout token
         uses: actions/create-github-app-token@v3
-        id: app_token
+        id: client-id
         with:
           app-id: client-id
           private-key: ${{ secrets.APP_PEM }}
@@ -155,7 +155,7 @@ jobs:
         uses: funkincrew/ci-checkout@v7.4
         with:
           submodules: 'recursive'
-          token: ${{ steps.app_token.outputs.token }}
+          token: ${{ steps.client-id.outputs.token }}
           persist-credentials: false
           submodule-aliases: |
             https://github.com/FunkinCrew/Funkin.assets > https://github.com/FunkinCrew/Funkin-assets-secret
@@ -163,7 +163,7 @@ jobs:
       - name: Setup build environment
         uses: ./.github/actions/setup-haxe
         with:
-          gh-token: ${{ steps.app_token.outputs.token }}
+          gh-token: ${{ steps.client-id.outputs.token }}
       - name: Setup HXCPP dev commit
         run: |
           cd .haxelib/hxcpp/git/tools/hxcpp
@@ -224,7 +224,7 @@ jobs:
     steps:
       - name: Get checkout token
         uses: actions/create-github-app-token@v3
-        id: app_token
+        id: client-id
         with:
           app-id: client-id
           private-key: ${{ secrets.APP_PEM }}
@@ -233,7 +233,7 @@ jobs:
         uses: funkincrew/ci-checkout@v7.4
         with:
           submodules: 'recursive'
-          token: ${{ steps.app_token.outputs.token }}
+          token: ${{ steps.client-id.outputs.token }}
           persist-credentials: false
           submodule-aliases: |
             https://github.com/FunkinCrew/Funkin.assets > https://github.com/FunkinCrew/Funkin-assets-secret
@@ -251,7 +251,7 @@ jobs:
       - if: ${{ steps.cache-hmm.outputs.cache-hit != 'true' }}
         name: Install dependencies
         run: |
-          git config --global 'url.https://x-access-token:${{ steps.app_token.outputs.token }}@github.com/.insteadOf' https://github.com/
+          git config --global 'url.https://x-access-token:${{ steps.client-id.outputs.token }}@github.com/.insteadOf' https://github.com/
           git config --global advice.detachedHead false
           haxelib --global git haxelib https://github.com/FunkinCrew/haxelib.git
           haxelib --global git hmm  https://github.com/FunkinCrew/hmm.git
