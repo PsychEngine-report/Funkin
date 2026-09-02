@@ -128,11 +128,11 @@ jobs:
       matrix:
         include:
           - target: windows
-            runs-on: windows
+            runs-on: windows-latest
           - target: macos
-            runs-on: macos
+            runs-on: macos-latest
           - target: ios
-            runs-on: macos
+            runs-on: macos-latest
     runs-on:
       - ${{ matrix.runs-on }}
     defaults:
@@ -210,8 +210,11 @@ jobs:
       matrix:
         include:
           - target: linux
+            runs-on: ubuntu-latest
           - target: html5
+            runs-on: ubuntu-latest
           - target: android
+            runs-on: macos-latest
     defaults:
       run:
         shell: bash
