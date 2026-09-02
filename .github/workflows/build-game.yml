@@ -90,7 +90,7 @@ jobs:
   docker-image:
     needs: [gather-changes, gather-tags]
     if: needs.gather-changes.outputs.trigger-build == 'true'
-    runs-on: build-set
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
@@ -204,7 +204,8 @@ jobs:
   build-game-in-container:
     needs: [gather-tags, docker-image]
     if: ${{ ! cancelled() }}
-    runs-on: build-set
+    runs-on: 
+      - ${{ matrix.runs-on }}
     container: ghcr.io/funkincrew/build-dependencies:${{ needs.gather-tags.outputs.primary }}
     strategy:
       matrix:
