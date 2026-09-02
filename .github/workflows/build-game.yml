@@ -131,9 +131,8 @@ jobs:
             runs-on: windows
           - target: macos
             runs-on: macos
-          # TODO: Install XCode to build iOS
-          # - target: ios
-          #   runs-on: macos
+          - target: ios
+            runs-on: macos
     runs-on:
       - ${{ matrix.runs-on }}
     defaults:
@@ -175,6 +174,11 @@ jobs:
           touch .env
           grep API_NG_APP_ID .env || echo API_NG_APP_ID=${{ secrets.API_NG_APP_ID }} >> .env
           grep API_NG_ENC_KEY .env || echo API_NG_ENC_KEY=${{ secrets.API_NG_ENC_KEY }} >> .env
+      - name: Setup XCode
+        if: ${{ matrix.target == 'ios' }}
+        uses: maxim-lobanov/setup-xcode@master
+        with:
+          xcode-version: '16.4'
       - name: Build game (windows)
         if: ${{ matrix.target == 'windows' }}
         run: |
@@ -207,7 +211,7 @@ jobs:
         include:
           - target: linux
           - target: html5
-          # - target: android
+          - target: android
     defaults:
       run:
         shell: bash
@@ -251,6 +255,13 @@ jobs:
           haxelib --global fixrepo
           haxelib --global list
           pushd .haxelib/hxcpp/git/tools/hxcpp && haxe compile.hxml && popd
+      - name: Configure Android x64
+        if: ${{ matrix.target == 'android' }}
+        run: |
+          haxelib run lime config ANDROID_SDK $ANDROID_HOME
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_LATEST_HOME
+          haxelib run lime config JAVA_HOME $JAVA_HOME_17_arm64
+          haxelib run lime config ANDROID_SETUP true
       - if: ${{ matrix.target != 'html5' }}
         name: Restore hxcpp cache
         uses: actions/cache@v5
